@@ -52,21 +52,12 @@
         return $q(
           function(resolve, reject){
             $http
-              .get(txDefault.ethGasStation)
+              .get('https://ethgasstation.info/json/ethgasAPI.json', {timeout:5000})
               .then(
                 function(response) {
-                  resolve(response.data.standard)
+                  resolve((response.data.safeLow / 10) * 1e9)
                 },
-                function (error) {
-                  // Get gas price from Ethereum Node
-                  Web3Service.web3.eth.getGasPrice(function (g_error, g_result) {
-                    if (g_error) {
-                      reject (g_error);
-                    } else {
-                      resolve(g_result);
-                    }
-                  });
-                }
+                reject
               )
           }
         );
@@ -186,7 +177,10 @@
               wallet.txParams.gasPrice = gasPrice;
               cb(null, gasPrice);
             },
-            cb
+            function () {
+              wallet.txParams.gasPrice = txDefault.gasPrice;
+              cb(null, txDefault.gasPrice);
+            }
           );
         }
         else {
@@ -583,7 +577,7 @@
             }
           );
 
-
+        
       };
 
       wallet.deployWithLimitFactoryOffline = function (owners, requiredConfirmations, limit, cb) {
@@ -1068,7 +1062,7 @@
               cb
             );
           }
-        });
+        });        
       };
 
       /**
@@ -1107,8 +1101,8 @@
               options,
               cb
             );
-          }
-        });
+          }          
+        });        
       };
 
       /**
@@ -1231,9 +1225,9 @@
                     options,
                     cb
                   );
-                }
+                }                
               }
-            );
+            );            
           }
         }).call();
       };
